@@ -1,6 +1,8 @@
 import requests
 import json
 
+from leg import Leg
+
 # read in api key from file
 with open('api_key.txt', 'r') as file:
     api_key = file.read().replace('\n', '')
