@@ -1,7 +1,6 @@
 import requests
 import json
-from itineraries import Itineraries
-
+from itineraries import Itinerary
 from leg import Leg
 
 # read in api key from file
@@ -30,9 +29,36 @@ def get_round_trip(departure_date, return_date):
     with open('get_round_trip.json', 'w') as file:
         file.write(json.dumps(response.json(), indent=4))
 
+    # parse json response into a list of Itinerary objects
+    itineraries = []
+    for itinerary in response.json()['data']['itineraries']:
+        id = itinerary['id']
+        price = itinerary['price']['raw']
+        legs = []
+        for leg in itinerary['legs']:
+            departure_airport = leg['origin']['displayCode']
+            arrival_airport = leg['destination']['displayCode']
+            departure_time = leg['departure']
+            arrival_time = leg['arrival']
+            duration = leg['durationInMinutes']
+            legs.append(Leg(departure_airport, arrival_airport, departure_time, arrival_time, duration))
+        itineraries.append(Itinerary(id, price, legs, 0, 0, 0, 0,0, 0, 0, 0))
+   
+   # print out the itineraries
+    for itinerary in itineraries:
+        print(itinerary)
+        for leg in itinerary.legs:
+            print(leg)
+        print("\n\n")
+
+    # save json string as beautiful json
+    with open('get_round_trip.json', 'w') as file:
+        file.write(json.dumps(response.json(), indent=4))
+
 def get_config():
     flights_api_url = base_url+"get-config"
     response = requests.get(flights_api_url, headers=headers)
+
     # save json string as beautiful json
     with open('get_config.json', 'w') as file:
         file.write(json.dumps(response.json(), indent=4))
