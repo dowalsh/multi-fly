@@ -11,27 +11,28 @@ headers = {
     "X-RapidAPI-Host": "skyscanner80.p.rapidapi.com"
 }
 
+def get_round_trip():
+    url = base_url + "flights/search-roundtrip"
+    querystring = {"fromId":"eyJzIjoiTllDQSIsImUiOiIyNzUzNzU0MiIsImgiOiIyNzUzNzU0MiIsInAiOiJDSVRZIn0=","toId":"eyJzIjoiTEFYQSIsImUiOiIyNzUzNjIxMSIsImgiOiIyNzUzNjIxMSIsInAiOiJDSVRZIn0=","departDate":"2024-03-11","returnDate":"<REQUIRED>","adults":"1","currency":"USD","market":"US","locale":"en-US"}
 
-# def get_round_trip():
-#     url = base_url + "flights/search-roundtrip"
+    response = requests.get(url, headers=headers, params=querystring)
 
-#     querystring = {"fromId":"eyJzIjoiTllDQSIsImUiOiIyNzUzNzU0MiIsImgiOiIyNzUzNzU0MiIsInAiOiJDSVRZIn0=","toId":"eyJzIjoiTEFYQSIsImUiOiIyNzUzNjIxMSIsImgiOiIyNzUzNjIxMSIsInAiOiJDSVRZIn0=","departDate":"2024-03-11","returnDate":"<REQUIRED>","adults":"1","currency":"USD","market":"US","locale":"en-US"}
+    with open('get_round_trip.json', 'w') as file:
+        file.write(json.dumps(response.json(), indent=4))
 
-#     response = requests.get(url, headers=headers, params=querystring)
-
-#     print(response.json())
-
-def get_config(api_key):
+def get_config():
     flights_api_url = base_url+"get-config"
     response = requests.get(flights_api_url, headers=headers)
     # save json string as beautiful json
-    with open('flights.json', 'w') as file:
+    with open('get_config.json', 'w') as file:
         file.write(json.dumps(response.json(), indent=4))
 
 
 def main():
     print("Hello World")
-    get_config(api_key)
+    get_config()
+    get_round_trip()
+
 
 if __name__ == '__main__':
     main()
