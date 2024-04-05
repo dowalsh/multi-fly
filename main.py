@@ -1,5 +1,6 @@
 import requests
 import json
+from itineraries import Itineraries
 
 # read in api key from file
 with open('api_key.txt', 'r') as file:
