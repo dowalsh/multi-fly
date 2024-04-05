@@ -13,7 +13,14 @@ headers = {
 
 def get_round_trip():
     url = base_url + "flights/search-roundtrip"
-    querystring = {"fromId":"eyJzIjoiTllDQSIsImUiOiIyNzUzNzU0MiIsImgiOiIyNzUzNzU0MiIsInAiOiJDSVRZIn0=","toId":"eyJzIjoiTEFYQSIsImUiOiIyNzUzNjIxMSIsImgiOiIyNzUzNjIxMSIsInAiOiJDSVRZIn0=","departDate":"2024-03-11","returnDate":"<REQUIRED>","adults":"1","currency":"USD","market":"US","locale":"en-US"}
+    querystring = {"fromId":"eyJzIjoiTllDQSIsImUiOiIyNzUzNzU0MiIsImgiOiIyNzUzNzU0MiIsInAiOiJDSVRZIn0=",
+                   "toId":"eyJzIjoiTEFYQSIsImUiOiIyNzUzNjIxMSIsImgiOiIyNzUzNjIxMSIsInAiOiJDSVRZIn0=",
+                   "departDate":"2024-05-30", # NOTE: THESE NEED TO BE FORMATTED AS YYYY-MM-DD - including 0s where necessary
+                   "returnDate":"2024-06-03",  
+                   "adults":"1",
+                   "currency":"USD",
+                   "market":"US",
+                   "locale":"en-US"}
 
     response = requests.get(url, headers=headers, params=querystring)
 
