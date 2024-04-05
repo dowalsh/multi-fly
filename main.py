@@ -1,5 +1,6 @@
 import requests
 import json
+from itineraries import Itineraries
 
 from leg import Leg
 
