@@ -11,7 +11,7 @@ headers = {
     "X-RapidAPI-Host": "skyscanner80.p.rapidapi.com"
 }
 
-def get_round_trip():
+def get_round_trip(departure_date, return_date):
     url = base_url + "flights/search-roundtrip"
     querystring = {"fromId":"eyJzIjoiTllDQSIsImUiOiIyNzUzNzU0MiIsImgiOiIyNzUzNzU0MiIsInAiOiJDSVRZIn0=",
                    "toId":"eyJzIjoiTEFYQSIsImUiOiIyNzUzNjIxMSIsImgiOiIyNzUzNjIxMSIsInAiOiJDSVRZIn0=",
@@ -36,9 +36,12 @@ def get_config():
 
 
 def main():
-    print("Hello World")
+    departure_date = "2024-05-30" # NOTE: THESE NEED TO BE FORMATTED AS YYYY-MM-DD - including 0s where necessary
+    return_date = "2024-06-03"  
+
+
     get_config()
-    get_round_trip()
+    get_round_trip(departure_date, return_date)
 
 
 if __name__ == '__main__':
