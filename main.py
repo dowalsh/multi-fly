@@ -1,7 +1,8 @@
 import requests
 import json
-from itineraries import Itinerary
+from itinerary import Itinerary
 from leg import Leg
+from itinerary_set import ItinerarySet
 
 # read in api key from file
 with open('api_key.txt', 'r') as file:
@@ -13,12 +14,12 @@ headers = {
     "X-RapidAPI-Host": "skyscanner80.p.rapidapi.com"
 }
 
-def get_round_trip(departure_date, return_date):
+def get_round_trip(fromId,toId,departDate, returnDate):
     url = base_url + "flights/search-roundtrip"
     querystring = {"fromId":"eyJzIjoiTllDQSIsImUiOiIyNzUzNzU0MiIsImgiOiIyNzUzNzU0MiIsInAiOiJDSVRZIn0=",
-                   "toId":"eyJzIjoiTEFYQSIsImUiOiIyNzUzNjIxMSIsImgiOiIyNzUzNjIxMSIsInAiOiJDSVRZIn0=",
-                   "departDate":"2024-05-30", # NOTE: THESE NEED TO BE FORMATTED AS YYYY-MM-DD - including 0s where necessary
-                   "returnDate":"2024-06-03",  
+                   "toId":  "eyJzIjoiTEFYQSIsImUiOiIyNzUzNjIxMSIsImgiOiIyNzUzNjIxMSIsInAiOiJDSVRZIn0=",
+                   "departDate":departDate, # NOTE: THESE NEED TO BE FORMATTED AS YYYY-MM-DD - including 0s where necessary
+                   "returnDate":returnDate,  
                    "adults":"1",
                    "currency":"USD",
                    "market":"US",
@@ -30,7 +31,9 @@ def get_round_trip(departure_date, return_date):
         file.write(json.dumps(response.json(), indent=4))
 
     # parse json response into a list of Itinerary objects
-    itineraries = []
+    # create an itinerary set
+    itineraries = ItinerarySet()
+    
     for itinerary in response.json()['data']['itineraries']:
         id = itinerary['id']
         price = itinerary['price']['raw']
@@ -42,7 +45,7 @@ def get_round_trip(departure_date, return_date):
             arrival_time = leg['arrival']
             duration = leg['durationInMinutes']
             legs.append(Leg(departure_airport, arrival_airport, departure_time, arrival_time, duration))
-        itineraries.append(Itinerary(id, price, legs, 0, 0, 0, 0,0, 0, 0, 0))
+        itineraries.add_itinerary(Itinerary(id, price, legs))
    
    # print out the itineraries
     for itinerary in itineraries:
@@ -54,6 +57,8 @@ def get_round_trip(departure_date, return_date):
     # save json string as beautiful json
     with open('get_round_trip.json', 'w') as file:
         file.write(json.dumps(response.json(), indent=4))
+
+    return itineraries
 
 def get_config():
     flights_api_url = base_url+"get-config"
@@ -68,10 +73,18 @@ def main():
     departure_date = "2024-05-30" # NOTE: THESE NEED TO BE FORMATTED AS YYYY-MM-DD - including 0s where necessary
     return_date = "2024-06-03"  
 
+    fromId = "eyJzIjoiTllDQSIsImUiOiIyNzUzNzU0MiIsImgiOiIyNzUzNzU0MiIsInAiOiJDSVRZIn0="
+    toId =  "eyJzIjoiTEFYQSIsImUiOiIyNzUzNjIxMSIsImgiOiIyNzUzNjIxMSIsInAiOiJDSVRZIn0="
 
-    get_config()
-    get_round_trip(departure_date, return_date)
+
+    # get_config()
+    itineraries = get_round_trip(fromId,toId,departure_date, return_date)
+    print(itineraries.get_cheapest_itinerary())
 
 
 if __name__ == '__main__':
     main()
+
+
+# Dylan hard code in some cities.
+

@@ -1,5 +1,6 @@
 class Itinerary:
-    def __init__(self, id, price, legs, isSelfTransfer, isProtectedSelfTransfer, farePolicy, eco, fareAttributes, isMashUp, hasFlexibleOptions, score):
+    # def __init__(self, id, price, legs, isSelfTransfer, isProtectedSelfTransfer, farePolicy, eco, fareAttributes, isMashUp, hasFlexibleOptions, score):
+    def __init__(self, id, price, legs):
         self.id = id
         self.price = price
         self.legs = legs
@@ -14,4 +15,8 @@ class Itinerary:
         # self.score = score
 
     def __str__(self):
-        return f"ID: {self.id}\nPrice: {self.price}\n"
+        # print price and each leg
+        return f"Price: {self.price}\n" + "\n".join([str(leg) for leg in self.legs])
+    
+    def get_total_cost(self):
+        return self.price
