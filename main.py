@@ -99,7 +99,30 @@ def main():
     for key, itineraries in itinerary_dict.items():
         print(f"From: {key[0]} To: {key[1]}")
         cheapest_itinerary = itineraries.get_cheapest_itinerary()
-        print(cheapest_itinerary)
+        print(cheapest_itinerary.get_total_cost())
+
+    # create dictionary to store ItinerarySet of the cheapest itinerary for each destination
+    cheapest_dict = {}
+    for destination in destinations:
+        # get the cheapest itinerary for each home
+        cheapest_itineraries = []
+        for home in homes:
+            if home == destination:
+                continue
+            # for each home, get the cheapest itinerary to the destination
+            cheapest_itinerary = itinerary_dict[(home, destination)].get_cheapest_itinerary()
+            cheapest_itineraries.append(cheapest_itinerary)
+        # store these itineraries in the cheapest_dict
+        cheapest_dict[destination] = cheapest_itineraries
+        
+    print("=====================================")
+    # print the total cost of the cheapest itineraries for each destination
+    for key, itineraries in cheapest_dict.items():
+        print(f"Destination: {key}")
+        total_cost = sum([itinerary.get_total_cost() for itinerary in itineraries])
+        print(total_cost)
+        
+
 
 
 if __name__ == '__main__':
