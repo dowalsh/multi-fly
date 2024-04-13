@@ -3,6 +3,8 @@ import json
 from itinerary import Itinerary
 from leg import Leg
 from itinerary_set import ItinerarySet
+from location import Location
+import os
 
 # read in api key from file
 with open('api_key.txt', 'r') as file:
@@ -14,27 +16,36 @@ headers = {
     "X-RapidAPI-Host": "skyscanner80.p.rapidapi.com"
 }
 
-def get_round_trip(fromId,toId,departDate, returnDate):
+def get_round_trip(fromLocation , toLocation ,departDate, returnDate):
+
     url = base_url + "flights/search-roundtrip"
-    querystring = {"fromId":"eyJzIjoiTllDQSIsImUiOiIyNzUzNzU0MiIsImgiOiIyNzUzNzU0MiIsInAiOiJDSVRZIn0=",
-                   "toId":  "eyJzIjoiTEFYQSIsImUiOiIyNzUzNjIxMSIsImgiOiIyNzUzNjIxMSIsInAiOiJDSVRZIn0=",
+    querystring = {"fromId": fromLocation.get_id(),
+                   "toId": toLocation.get_id(),
                    "departDate":departDate, # NOTE: THESE NEED TO BE FORMATTED AS YYYY-MM-DD - including 0s where necessary
                    "returnDate":returnDate,  
                    "adults":"1",
                    "currency":"USD",
                    "market":"US",
                    "locale":"en-US"}
+    
+    # name the file with from and to locations
+    filename = f"data/{fromLocation.get_name()}_to_{toLocation.get_name()}.json"
 
-    response = requests.get(url, headers=headers, params=querystring)
-
-    with open('get_round_trip.json', 'w') as file:
-        file.write(json.dumps(response.json(), indent=4))
-
+    # if filename exists, read from file, else make api call and save to file
+    if os.path.exists(filename):
+        with open(filename, 'r') as file:
+            response_json = json.load(file)
+    else:
+        response = requests.get(url, headers=headers, params=querystring)
+        response_json = response.json()
+        with open(filename, 'w') as file:
+            file.write(json.dumps(response_json, indent=4))
+  
     # parse json response into a list of Itinerary objects
     # create an itinerary set
     itineraries = ItinerarySet()
     
-    for itinerary in response.json()['data']['itineraries']:
+    for itinerary in response_json['data']['itineraries']:
         id = itinerary['id']
         price = itinerary['price']['raw']
         legs = []
@@ -47,16 +58,6 @@ def get_round_trip(fromId,toId,departDate, returnDate):
             legs.append(Leg(departure_airport, arrival_airport, departure_time, arrival_time, duration))
         itineraries.add_itinerary(Itinerary(id, price, legs))
    
-   # print out the itineraries
-    for itinerary in itineraries:
-        print(itinerary)
-        for leg in itinerary.legs:
-            print(leg)
-        print("\n\n")
-
-    # save json string as beautiful json
-    with open('get_round_trip.json', 'w') as file:
-        file.write(json.dumps(response.json(), indent=4))
 
     return itineraries
 
@@ -65,7 +66,7 @@ def get_config():
     response = requests.get(flights_api_url, headers=headers)
 
     # save json string as beautiful json
-    with open('get_config.json', 'w') as file:
+    with open('data/get_config.json', 'w') as file:
         file.write(json.dumps(response.json(), indent=4))
 
 
@@ -73,18 +74,36 @@ def main():
     departure_date = "2024-05-30" # NOTE: THESE NEED TO BE FORMATTED AS YYYY-MM-DD - including 0s where necessary
     return_date = "2024-06-03"  
 
+    # create hard coded set of 3 possible destinations
+    destinations = [Location("London", "eyJzIjoiTE9ORCIsImUiOiIyNzU0NDAwOCIsImgiOiIyNzU0NDAwOCJ9="), 
+                    Location("Prague", "eyJzIjoiUFJHIiwiZSI6Ijk1NjczNTAyIiwiaCI6IjI3NTQ2MDMzIn0="), 
+                    Location("Berlin", "eyJzIjoiQkVSIiwiZSI6Ijk1NjczMzgzIiwiaCI6IjI3NTQ3MDUzIn0=")]
+    
+    homes =  [Location("London", "eyJzIjoiTE9ORCIsImUiOiIyNzU0NDAwOCIsImgiOiIyNzU0NDAwOCJ9="), 
+                    Location("Prague", "eyJzIjoiUFJHIiwiZSI6Ijk1NjczNTAyIiwiaCI6IjI3NTQ2MDMzIn0="), 
+                    Location("Berlin", "eyJzIjoiQkVSIiwiZSI6Ijk1NjczMzgzIiwiaCI6IjI3NTQ3MDUzIn0=")]
+
     fromId = "eyJzIjoiTllDQSIsImUiOiIyNzUzNzU0MiIsImgiOiIyNzUzNzU0MiIsInAiOiJDSVRZIn0="
     toId =  "eyJzIjoiTEFYQSIsImUiOiIyNzUzNjIxMSIsImgiOiIyNzUzNjIxMSIsInAiOiJDSVRZIn0="
 
+    #  create dictionary to store ItinerarySet for each combination of home and destination
+    itinerary_dict = {}
+    for home in homes:
+        for destination in destinations:
+            # check if home and destination are the same
+            if home == destination:
+                continue
+            itinerary_dict[(home, destination)] = get_round_trip(home,destination,departure_date, return_date)
 
-    # get_config()
-    itineraries = get_round_trip(fromId,toId,departure_date, return_date)
-    print(itineraries.get_cheapest_itinerary())
+    # print the cheapest itinerary for each combination of home and destination
+    for key, itineraries in itinerary_dict.items():
+        print(f"From: {key[0]} To: {key[1]}")
+        cheapest_itinerary = itineraries.get_cheapest_itinerary()
+        print(cheapest_itinerary)
 
 
 if __name__ == '__main__':
     main()
 
 
-# Dylan hard code in some cities.
 
