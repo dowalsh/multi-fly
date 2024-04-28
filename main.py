@@ -28,8 +28,8 @@ def get_round_trip(fromLocation , toLocation ,departDate, returnDate):
                    "market":"US",
                    "locale":"en-US"}
     
-    # name the file with from and to locations
-    filename = f"data/{fromLocation.get_name()}_to_{toLocation.get_name()}.json"
+    # name the file with from and to locations and dates
+    filename = f"data/{fromLocation.get_name()}_{toLocation.get_name()}_{departDate}_{returnDate}.json"
 
     # if filename exists, read from file, else make api call and save to file
     if os.path.exists(filename):
@@ -131,3 +131,4 @@ if __name__ == '__main__':
 
 
 # next steps - think about user interface - selecting airports, dates, etc?
+# maybe an async solution here makes sense - where 
