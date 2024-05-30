@@ -117,9 +117,8 @@ def main():
 
     # print the cheapest itinerary for each combination of home and destination
     for key, itineraries in itinerary_dict.items():
-        print(f"From: {key[0]} To: {key[1]}")
         cheapest_itinerary = itineraries.get_cheapest_itinerary()
-        print(cheapest_itinerary.get_total_cost())
+        print(f"{key[0]} -> {key[1]}: {cheapest_itinerary.get_total_cost()}")
 
     # create dictionary to store ItinerarySet of the cheapest itinerary for each destination
     cheapest_dict = {}
