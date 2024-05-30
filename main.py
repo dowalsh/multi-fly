@@ -6,6 +6,10 @@ from itinerary_set import ItinerarySet
 from location import Location
 import os
 
+
+global use_cache
+use_cache = True
+
 # read in api key from file
 with open('api_key.txt', 'r') as file:
     api_key = file.read().replace('\n', '')
@@ -32,10 +36,13 @@ def get_round_trip(fromLocation , toLocation ,departDate, returnDate):
     filename = f"data/{fromLocation.get_name()}_{toLocation.get_name()}_{departDate}_{returnDate}.json"
 
     # if filename exists, read from file, else make api call and save to file
-    if os.path.exists(filename):
+    if use_cache and os.path.exists(filename):
         with open(filename, 'r') as file:
             response_json = json.load(file)
     else:
+        # print the full url and querystring        
+        print(url) 
+        print(querystring)
         response = requests.get(url, headers=headers, params=querystring)
         response_json = response.json()
         with open(filename, 'w') as file:
@@ -69,10 +76,23 @@ def get_config():
     with open('data/get_config.json', 'w') as file:
         file.write(json.dumps(response.json(), indent=4))
 
+def get_airport_ids():
+    # a way to get all airports and their corresponding ids...
+    # not being used yet...
+    url = "https://sky-scanner3.p.rapidapi.com/flights/airports"
+
+    headers = {
+	    "x-rapidapi-key": "181827ffb8msh06543a1290959bep1aa22bjsnc4fdf143fc4a",
+	    "x-rapidapi-host": "sky-scanner3.p.rapidapi.com"
+    }
+
+    response = requests.get(url, headers=headers)
+
+    print(response.json())  
 
 def main():
-    departure_date = "2024-05-30" # NOTE: THESE NEED TO BE FORMATTED AS YYYY-MM-DD - including 0s where necessary
-    return_date = "2024-06-03"  
+    departure_date = "2024-06-02" # NOTE: THESE NEED TO BE FORMATTED AS YYYY-MM-DD - including 0s where necessary
+    return_date = "2024-06-08"  
 
     # create hard coded set of 3 possible destinations
     destinations = [Location("London", "eyJzIjoiTE9ORCIsImUiOiIyNzU0NDAwOCIsImgiOiIyNzU0NDAwOCJ9="), 
@@ -132,3 +152,6 @@ if __name__ == '__main__':
 
 # next steps - think about user interface - selecting airports, dates, etc?
 # maybe an async solution here makes sense - where 
+
+# would be great to be able to run this somewhat regularly to monitor prices for great deals - maybe a cron job or something?
+# perhaps the output could be an email notification.
