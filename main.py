@@ -88,7 +88,10 @@ def get_airport_ids():
 
     response = requests.get(url, headers=headers)
 
-    print(response.json())  
+    # save response as beautiful json
+    with open('data/airports.json', 'w') as file:
+        file.write(json.dumps(response.json(), indent=4))
+
 
 def main():
     departure_date = "2024-06-02" # NOTE: THESE NEED TO BE FORMATTED AS YYYY-MM-DD - including 0s where necessary
