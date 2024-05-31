@@ -1,5 +1,7 @@
 class Leg:
-    def __init__(self, departure_airport, arrival_airport, departure_time, arrival_time, duration):
+    def __init__(
+        self, departure_airport, arrival_airport, departure_time, arrival_time, duration
+    ):
         self.departure_airport = departure_airport
         self.arrival_airport = arrival_airport
         self.departure_time = departure_time

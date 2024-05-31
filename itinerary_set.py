@@ -17,8 +17,10 @@ class ItinerarySet:
     def get_cheapest_itinerary(self):
         if not self.itineraries:
             return None
-        cheapest_itinerary = min(self.itineraries, key=lambda itinerary: itinerary.get_total_cost())
+        cheapest_itinerary = min(
+            self.itineraries, key=lambda itinerary: itinerary.get_total_cost()
+        )
         return cheapest_itinerary
-    
+
     def __iter__(self):
         return iter(self.itineraries)

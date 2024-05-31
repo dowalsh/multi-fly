@@ -17,6 +17,6 @@ class Itinerary:
     def __str__(self):
         # print price and each leg
         return f"Price: {self.price}\n" + "\n".join([str(leg) for leg in self.legs])
-    
+
     def get_total_cost(self):
         return self.price

@@ -1,3 +1,7 @@
 api_key.txt
 *.json
 __pycache__/
+# ignore .venv files
+.venv/
+# ignore ds_store files
+.DS_Store
